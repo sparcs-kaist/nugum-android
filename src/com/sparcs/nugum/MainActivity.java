@@ -20,9 +20,14 @@ import android.app.ListActivity;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -32,9 +37,10 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.example.nugum.*;
 
-public class MainActivity extends Activity {
+public class MainActivity<listNames> extends Activity {
 	List<Person> listData;
 	ArrayList<String> listNames;
+    ArrayAdapter<String> Adapter;
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,19 +51,21 @@ public class MainActivity extends Activity {
         
         ListView list=(ListView) findViewById(R.id.ListView01);
         final EditText edit = (EditText)findViewById(R.id.EditText01);
-        ArrayAdapter<String> Adapter;
+
         Adapter= new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listNames);
         
         list.setAdapter(Adapter);
         list.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-    }
-	
-	public void mOnClick(View v){
-	
-		AdapterView.OnItemClickListener mItemClickListener=
-			new AdapterView.OnItemClickListener() {
-				public void onItemClick(AdapterView parent,View view,int position,long id){
-					final String pager = listData.get(position).pager;
+        list.setTextFilterEnabled(true);
+        list.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+					InputMethodManager inputManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+					inputManager.hideSoftInputFromWindow(edit.getWindowToken(),0); 
+					
+					final String pager = listData.get(arg2).pager;
 					new AlertDialog.Builder(MainActivity.this)
 					.setTitle("전화를 걸겠어요?")
 					.setMessage("전화번호 :" + pager)
@@ -74,11 +82,44 @@ public class MainActivity extends Activity {
 						}
 					})
 					.show();
-				}
-		};
-	}
-				
-	
+				};
+        	
+		});
+        
+        
+        edit.addTextChangedListener(new TextWatcher()
+        {
+           @Override
+           public void onTextChanged( CharSequence arg0, int arg1, int arg2, int arg3)
+           {
+               // TODO Auto-generated method stub
+        	   Adapter.getFilter().filter(arg0);
+           }
+
+           @Override
+           public void beforeTextChanged( CharSequence arg0, int arg1, int arg2, int arg3)
+           {
+               // TODO Auto-generated method stub
+
+           }
+
+           @Override
+           public void afterTextChanged( Editable arg0)
+           {
+               // TODO Auto-generated method stub
+           }
+        });
+        edit.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				InputMethodManager inputManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+				inputManager.showSoftInput(edit,0); 
+			}
+		});
+    }
+		
 	/*
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
