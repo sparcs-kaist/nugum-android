@@ -14,6 +14,7 @@ import org.apache.http.util.EntityUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.preference.ListPreference;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
@@ -35,12 +36,10 @@ import android.widget.ListView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.example.nugum.*;
 
 public class MainActivity<listNames> extends Activity {
 	List<Person> listData;
-	ArrayList<String> listNames;
-    ArrayAdapter<String> Adapter;
+    ArrayAdapter<Person> Adapter;
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,7 +51,7 @@ public class MainActivity<listNames> extends Activity {
         ListView list=(ListView) findViewById(R.id.ListView01);
         final EditText edit = (EditText)findViewById(R.id.EditText01);
 
-        Adapter= new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listNames);
+        Adapter= new ArrayAdapter<Person>(this, android.R.layout.simple_list_item_1, listData);
         
         list.setAdapter(Adapter);
         list.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
@@ -60,29 +59,18 @@ public class MainActivity<listNames> extends Activity {
         list.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
-					InputMethodManager inputManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-					inputManager.hideSoftInputFromWindow(edit.getWindowToken(),0); 
+			public void onItemClick(AdapterView<?> arg0, View arg1, int position,long arg3) {
 					
-					final String pager = listData.get(arg2).pager;
-					new AlertDialog.Builder(MainActivity.this)
-					.setTitle("전화를 걸겠어요?")
-					.setMessage("전화번호 :" + pager)
-					.setPositiveButton("걸기",new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							// TODO Auto-generated method stub
-							call(pager);
-						}
-					})
-					.setNegativeButton("닫기",new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							// TODO Auto-generated method stub
-							
-						}
-					})
-					.show();
-				};
+				
+				InputMethodManager inputManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+				inputManager.hideSoftInputFromWindow(edit.getWindowToken(),0); 
+			
+				Intent intent = new Intent(MainActivity.this,PersonActivity.class);
+				Person selectedPerson = Adapter.getItem(position);
+				intent.putExtra("name", selectedPerson.name);
+				intent.putExtra("pager", selectedPerson.pager);
+				startActivity(intent);
+			};
         	
 		});
         
@@ -90,10 +78,10 @@ public class MainActivity<listNames> extends Activity {
         edit.addTextChangedListener(new TextWatcher()
         {
            @Override
-           public void onTextChanged( CharSequence arg0, int arg1, int arg2, int arg3)
+           public void onTextChanged( CharSequence s, int start, int count, int after)
            {
                // TODO Auto-generated method stub
-        	   Adapter.getFilter().filter(arg0);
+        	   Adapter.getFilter().filter(s);
            }
 
            @Override
@@ -119,46 +107,7 @@ public class MainActivity<listNames> extends Activity {
 			}
 		});
     }
-		
-	/*
-	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
-		// TODO Auto-generated method stub
-		super.onListItemClick(l, v, position, id);
-		
-		final String pager = listData.get(position).pager;
-		new AlertDialog.Builder(MainActivity.this)
-		.setTitle("전화를 걸겠어요?")
-		.setMessage("전화번호 :" + pager)
-		.setPositiveButton("걸기",new DialogInterface.OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				// TODO Auto-generated method stub
-				call(pager);
-			}
-		})
-		.setNegativeButton("닫기",new DialogInterface.OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				// TODO Auto-generated method stub
-				
-			}
-		})
-		.show();
-		
-	}
-	*/
-	private void call(String phonenum){
-		try{
-			Intent callIntent = new Intent(Intent.ACTION_CALL);
-			callIntent.setData(Uri.parse("tel:"+phonenum.replace("-","")));
-			startActivity(callIntent);
-		}catch(ActivityNotFoundException e){
-			Log.e("Dialing error","Call falied",e);
-		}
-	}
+
 	
 	private void getAddress() {
 		try
@@ -176,10 +125,6 @@ public class MainActivity<listNames> extends Activity {
 		        	Type type = new TypeToken<List<Person>>(){}.getType();
 		        	String jsonString = EntityUtils.toString(resEntityGet);
 		        	listData=gson.fromJson(jsonString,type);
-		        	listNames=new ArrayList<String>();
-		        	for (Person i : listData) {
-						listNames.add(i.name);
-					}
 		        }
 		}
 		catch (Exception e)

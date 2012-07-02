@@ -18,4 +18,9 @@ public class Person {
 	String org;
 	String msn;
 	String blog;
+	
+	public String toString()
+	{
+		return name;
+	}
 }
