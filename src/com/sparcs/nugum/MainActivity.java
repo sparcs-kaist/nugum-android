@@ -28,15 +28,17 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import com.example.nugum.R;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.example.nugum.*;
+
 public class MainActivity extends Activity {
 	List<Person> listData;
 	ArrayList<String> listNames;
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
         getAddress();
@@ -44,7 +46,7 @@ public class MainActivity extends Activity {
         ListView list=(ListView) findViewById(R.id.ListView01);
         final EditText edit = (EditText)findViewById(R.id.EditText01);
         ArrayAdapter<String> Adapter;
-        Adapter= new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,listNames);
+        Adapter= new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listNames);
         
         list.setAdapter(Adapter);
         list.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
