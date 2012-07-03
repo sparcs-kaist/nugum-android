@@ -33,6 +33,7 @@ public class PersonActivity extends Activity {
         Button callButton = (Button)findViewById(R.id.PersonActivityButtonCall);
         Button textButton = (Button)findViewById(R.id.PersonActivityButtonText);
         Button sparcsmailButton = (Button)findViewById(R.id.PresonActivitySendSPARCSMail);
+        Button emailButton = (Button)findViewById(R.id.PersonActivitySendMail);
         Button addContactButton = (Button)findViewById(R.id.PersonActivityAddContact);
         
         intent=getIntent();
@@ -41,15 +42,22 @@ public class PersonActivity extends Activity {
         //sparcsmailText.setText(intent.getStringExtra("sparcsID")+"@sparcs.org");
         callButton.setText("전화번호 : "+intent.getStringExtra("pager"));
         callButton.setBackgroundColor(Color.rgb(240, 240, 240));
-        sparcsmailButton.setText("이메일 : "+intent.getStringExtra("sparcsID")+"@sparcs.org");
+        sparcsmailButton.setText("스팍스이메일 : "+intent.getStringExtra("sparcsID")+"@sparcs.org");
         sparcsmailButton.setBackgroundColor(Color.rgb(240, 240, 240));
+        emailButton.setText("이메일 : "+intent.getStringExtra("email"));
+        emailButton.setBackgroundColor(Color.rgb(240, 240, 240));
         
         if(intent.getStringExtra("pager").equals(""))
         {
         	//pagerText.setText("전화번호가 없습니다.");
         	callButton.setText("전화번호 : 전화번호가 없습니다.");
         	callButton.setEnabled(false);
-        	textButton.setVisibility(4);
+        	textButton.setVisibility(8);
+        }
+        if(intent.getStringExtra("email").equals(""))
+        {
+        	emailButton.setEnabled(false);
+        	emailButton.setVisibility(8);
         }
         
         callButton.setOnClickListener( new OnClickListener() {
@@ -82,7 +90,18 @@ public class PersonActivity extends Activity {
 				Intent it = new Intent(Intent.ACTION_SENDTO, uri);
 				startActivity(it);
 			}
-		});    
+		});   
+        
+        emailButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Uri uri = Uri.parse("mailto:"+intent.getStringExtra("email"));
+				Intent it=new Intent(Intent.ACTION_SENDTO,uri);
+				startActivity(it);
+			}
+		});
         
         addContactButton.setOnClickListener(new OnClickListener() {
 			
@@ -133,7 +152,8 @@ public class PersonActivity extends Activity {
 	{
 		String DisplayName = intent.getStringExtra("name");
 		String MobileNumber = intent.getStringExtra("pager");
-		String emailID = intent.getStringExtra("sparcsID")+"@sparcs.org";
+		String sparcsemailID = intent.getStringExtra("sparcsID")+"@sparcs.org";
+		String emailID = intent.getStringExtra("email");
 
 		ArrayList<ContentProviderOperation> ops = 
 		    new ArrayList<ContentProviderOperation>();
@@ -174,6 +194,18 @@ public class PersonActivity extends Activity {
 		    );
 		}
 
+        //------------------------------------------------------ SPARCSEmail
+        if(sparcsemailID != null)
+        {
+             ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                        .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+                        .withValue(ContactsContract.Data.MIMETYPE,
+                                ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE)
+                        .withValue(ContactsContract.CommonDataKinds.Email.DATA, sparcsemailID)
+                        .withValue(ContactsContract.CommonDataKinds.Email.TYPE, ContactsContract.CommonDataKinds.Email.TYPE_WORK)
+                        .build());
+        }
+        
         //------------------------------------------------------ Email
         if(emailID != null)
         {
@@ -182,7 +214,7 @@ public class PersonActivity extends Activity {
                         .withValue(ContactsContract.Data.MIMETYPE,
                                 ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE)
                         .withValue(ContactsContract.CommonDataKinds.Email.DATA, emailID)
-                        .withValue(ContactsContract.CommonDataKinds.Email.TYPE, ContactsContract.CommonDataKinds.Email.TYPE_WORK)
+                        .withValue(ContactsContract.CommonDataKinds.Email.TYPE, ContactsContract.CommonDataKinds.Email.TYPE_HOME)
                         .build());
         }
         /*
@@ -236,5 +268,7 @@ public class PersonActivity extends Activity {
             e.printStackTrace();
             Toast.makeText(PersonActivity.this, "Exception: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
+        
+        Toast.makeText(PersonActivity.this,DisplayName+" 님의 연락처가 추가되었습니다.",Toast.LENGTH_SHORT).show();
 	}
 }

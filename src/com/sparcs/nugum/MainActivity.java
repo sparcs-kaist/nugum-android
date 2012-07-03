@@ -24,6 +24,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -61,6 +62,7 @@ public class MainActivity<listNames> extends Activity {
 				intent.putExtra("name", selectedPerson.name);
 				intent.putExtra("pager", selectedPerson.pager);
 				intent.putExtra("sparcsID",selectedPerson.id);
+				intent.putExtra("email", selectedPerson.email);
 				startActivity(intent);
 			};
         	
@@ -121,7 +123,8 @@ public class MainActivity<listNames> extends Activity {
 		}
 		catch (Exception e)
 		{
-		        e.printStackTrace();
+		        //e.printStackTrace();
+		        Toast.makeText(MainActivity.this, "네트워크 연결상태가 좋지 않습니다.", Toast.LENGTH_SHORT).show();
 		}
 	}
 
