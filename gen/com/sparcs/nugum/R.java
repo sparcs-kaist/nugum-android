@@ -23,9 +23,12 @@ public final class R {
         public static final int EditText01=0x7f080000;
         public static final int ListView01=0x7f080001;
         public static final int PersonActivityButtonCall=0x7f080004;
+        public static final int PersonActivityButtonText=0x7f080005;
         public static final int PersonActivityTextName=0x7f080002;
         public static final int PersonActivityTextPager=0x7f080003;
-        public static final int menu_settings=0x7f080005;
+        public static final int PersonActivityTextSPARCSMail=0x7f080006;
+        public static final int PresonActivitySendSPARCSMail=0x7f080007;
+        public static final int menu_settings=0x7f080008;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
@@ -41,6 +44,8 @@ public final class R {
         public static final int makeCall=0x7f050006;
         public static final int menu_settings=0x7f050002;
         public static final int name=0x7f050004;
+        public static final int sendSPARCSMail=0x7f050008;
+        public static final int sendText=0x7f050007;
         public static final int title_activity_main=0x7f050003;
         public static final int title_activity_person=0x7f050005;
     }

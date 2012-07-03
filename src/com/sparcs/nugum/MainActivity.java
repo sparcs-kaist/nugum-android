@@ -69,6 +69,7 @@ public class MainActivity<listNames> extends Activity {
 				Person selectedPerson = Adapter.getItem(position);
 				intent.putExtra("name", selectedPerson.name);
 				intent.putExtra("pager", selectedPerson.pager);
+				intent.putExtra("sparcsID",selectedPerson.id);
 				startActivity(intent);
 			};
         	

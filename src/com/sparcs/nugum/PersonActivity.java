@@ -23,14 +23,20 @@ public class PersonActivity extends Activity {
         
         TextView nameText= (TextView)findViewById(R.id.PersonActivityTextName);
         TextView pagerText= (TextView)findViewById(R.id.PersonActivityTextPager);
+        TextView sparcsmailText=(TextView)findViewById(R.id.PersonActivityTextSPARCSMail);
         Button callButton = (Button)findViewById(R.id.PersonActivityButtonCall);
+        Button textButton = (Button)findViewById(R.id.PersonActivityButtonText);
+        Button sparcsmailButton = (Button)findViewById(R.id.PresonActivitySendSPARCSMail);
+        
         intent=getIntent();
         nameText.setText(intent.getStringExtra("name"));
         pagerText.setText(intent.getStringExtra("pager"));
+        sparcsmailText.setText(intent.getStringExtra("sparcsID")+"@sparcs.org");
         if(intent.getStringExtra("pager").equals(""))
         {
         	pagerText.setText("전화번호가 없습니다.");
         	callButton.setVisibility(4);
+        	textButton.setVisibility(4);
         }
         
         callButton.setOnClickListener( new OnClickListener() {
@@ -41,6 +47,31 @@ public class PersonActivity extends Activity {
 				call(intent.getStringExtra("pager"));	
 			}
 		});
+        
+        textButton.setOnClickListener( new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+				Intent sendIntent = new Intent(Intent.ACTION_VIEW);
+				sendIntent.putExtra("address", intent.getStringExtra("pager"));
+				sendIntent.setType("vnd.android-dir/mms-sms");
+				startActivity(sendIntent);
+			}
+		});
+        
+        sparcsmailButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Uri uri = Uri.parse("mailto:"+intent.getStringExtra("sparcsID")+"@sparcs.org");
+				Intent it = new Intent(Intent.ACTION_SENDTO, uri);
+				startActivity(it);
+			}
+		});
+        
+        
     }
 
     @Override
