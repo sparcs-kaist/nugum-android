@@ -1,6 +1,7 @@
 package com.sparcs.nugum;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
@@ -10,10 +11,10 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
-import android.os.Bundle;
-import android.os.StrictMode;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
+import android.os.StrictMode;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -30,7 +31,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 public class MainActivity<listNames> extends Activity {
-	List<Person> listData;
+	ArrayList<Person> listData;
     ArrayAdapter<Person> Adapter;
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,7 +44,7 @@ public class MainActivity<listNames> extends Activity {
         ListView list=(ListView) findViewById(R.id.ListView01);
         final EditText edit = (EditText)findViewById(R.id.EditText01);
 
-        Adapter= new ArrayAdapter<Person>(this, android.R.layout.simple_list_item_1, listData);
+        Adapter= new ResultAdapter(this, android.R.layout.simple_list_item_1, listData, false);
         
         list.setAdapter(Adapter);
         list.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
