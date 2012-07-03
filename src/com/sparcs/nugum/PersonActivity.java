@@ -4,24 +4,21 @@ import java.util.ArrayList;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.provider.ContactsContract;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.ContentProviderOperation;
-import android.content.ContentProviderResult;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.OperationApplicationException;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.support.v4.app.NavUtils;
 
 public class PersonActivity extends Activity {
 	private Intent intent;
@@ -92,7 +89,25 @@ public class PersonActivity extends Activity {
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
-				Toast.makeText(PersonActivity.this,"아직 준비중인 기능입니다.",Toast.LENGTH_SHORT).show();
+				DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+				    @Override
+				    public void onClick(DialogInterface dialog, int which) {
+				        switch (which){
+				        case DialogInterface.BUTTON_POSITIVE:
+				            //Yes button clicked
+				        	addContact(intent);
+				            break;
+
+				        case DialogInterface.BUTTON_NEGATIVE:
+				            //No button clicked
+				            break;
+				        }
+				    }
+				};
+
+				AlertDialog.Builder builder = new AlertDialog.Builder(PersonActivity.this);
+				builder.setMessage("연락처에 "+intent.getStringExtra("name")+" 님의 연락처를 추가하겠습니까?").setPositiveButton("Yes", dialogClickListener)
+				    .setNegativeButton("No", dialogClickListener).show();
 			}
 		});
 
@@ -112,5 +127,114 @@ public class PersonActivity extends Activity {
 		}catch(ActivityNotFoundException e){
 			Log.e("Dialing error","Call falied",e);
 		}
+	}
+	
+	private void addContact(Intent intent)
+	{
+		String DisplayName = intent.getStringExtra("name");
+		String MobileNumber = intent.getStringExtra("pager");
+		String emailID = intent.getStringExtra("sparcsID")+"@sparcs.org";
+
+		ArrayList<ContentProviderOperation> ops = 
+		    new ArrayList<ContentProviderOperation>();
+
+		ops.add(ContentProviderOperation.newInsert(
+		    ContactsContract.RawContacts.CONTENT_URI)
+		    .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
+		    .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null)
+		    .build()
+		);
+
+		//------------------------------------------------------ Names
+		if(DisplayName != null)
+		{           
+		    ops.add(ContentProviderOperation.newInsert(
+		        ContactsContract.Data.CONTENT_URI)              
+		        .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+		        .withValue(ContactsContract.Data.MIMETYPE,
+		            ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+		        .withValue(
+		            ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME,     
+		            DisplayName).build()
+		    );
+		} 
+
+		//------------------------------------------------------ Mobile Number                      
+		if(MobileNumber != null)
+		{
+		    ops.add(ContentProviderOperation.
+		        newInsert(ContactsContract.Data.CONTENT_URI)
+		        .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+		        .withValue(ContactsContract.Data.MIMETYPE,
+		        ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+		        .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, MobileNumber)
+		        .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, 
+		        ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)
+		        .build()
+		    );
+		}
+
+        //------------------------------------------------------ Email
+        if(emailID != null)
+        {
+             ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                        .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+                        .withValue(ContactsContract.Data.MIMETYPE,
+                                ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE)
+                        .withValue(ContactsContract.CommonDataKinds.Email.DATA, emailID)
+                        .withValue(ContactsContract.CommonDataKinds.Email.TYPE, ContactsContract.CommonDataKinds.Email.TYPE_WORK)
+                        .build());
+        }
+        /*
+        //------------------------------------------------------ Home Numbers
+		if(HomeNumber != null)
+        {
+            ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+                    .withValue(ContactsContract.Data.MIMETYPE,
+                            ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+                    .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, HomeNumber)
+                    .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, 
+                            ContactsContract.CommonDataKinds.Phone.TYPE_HOME)
+                    .build());
+        }
+
+        //------------------------------------------------------ Work Numbers
+        if(WorkNumber != null)
+        {
+            ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+                    .withValue(ContactsContract.Data.MIMETYPE,
+                            ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+                    .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, WorkNumber)
+                    .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, 
+                            ContactsContract.CommonDataKinds.Phone.TYPE_WORK)
+                    .build());
+        }
+        //------------------------------------------------------ Organization
+        if(!company.equals("") && !jobTitle.equals(""))
+        {
+            ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+                    .withValue(ContactsContract.Data.MIMETYPE,
+                            ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE)
+                    .withValue(ContactsContract.CommonDataKinds.Organization.COMPANY, company)
+                    .withValue(ContactsContract.CommonDataKinds.Organization.TYPE, ContactsContract.CommonDataKinds.Organization.TYPE_WORK)
+                    .withValue(ContactsContract.CommonDataKinds.Organization.TITLE, jobTitle)
+                    .withValue(ContactsContract.CommonDataKinds.Organization.TYPE, ContactsContract.CommonDataKinds.Organization.TYPE_WORK)
+                    .build());
+        }
+*/
+        
+        // Asking the Contact provider to create a new contact                  
+        try 
+        {
+            getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
+        } 
+        catch (Exception e) 
+        {               
+            e.printStackTrace();
+            Toast.makeText(PersonActivity.this, "Exception: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
 	}
 }
