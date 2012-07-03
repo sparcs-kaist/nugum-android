@@ -6,8 +6,7 @@
     <string name="title_activity_main">Nugum</string>
     <string name="name">이름</string>
     <string name="title_activity_person">PersonActivity</string>
-    <string name="makeCall">전화걸기</string>
     <string name="sendText">문자보내기</string>
-    <string name="sendSPARCSMail">SPARCS메일로 메일보내기</string>
+    <string name="addContact">연락처에 추가</string>
 
 </resources>
