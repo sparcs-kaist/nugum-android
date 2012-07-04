@@ -1,0 +1,59 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" 
+    android:orientation="vertical">
+    
+    <TextView 
+        android:text="SPARCS 회원 로그인"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"/>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content" 
+    android:orientation="horizontal">
+    <TextView
+        android:text="@string/ID"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"/>
+	<EditText
+	    android:id="@+id/LoginActivityIDEdit"
+	    android:layout_width="240dp"
+	    android:layout_height="wrap_content"
+	    android:inputType="text"
+	    android:hint="@string/ID"/>
+    </LinearLayout>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content" 
+    android:orientation="horizontal">
+    <TextView
+        android:text="@string/Password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"/>
+	<EditText
+	    android:id="@+id/LoginActivityPWEdit"
+	    android:layout_width="240dp"
+	    android:layout_height="wrap_content"
+	    android:inputType="textPassword"
+	    android:imeOptions="actionSearch"
+	    android:singleLine="true"
+	    android:hint="@string/Password"/>
+    </LinearLayout>
+    
+    <Button
+        android:id="@+id/LoginActivityBT"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/login"
+        android:padding="10dp"/>
+
+	
+    
+</LinearLayout>
