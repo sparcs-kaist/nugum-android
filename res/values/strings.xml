@@ -8,5 +8,9 @@
     <string name="title_activity_person">PersonActivity</string>
     <string name="sendText">문자보내기</string>
     <string name="addContact">연락처에 추가</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="ID">ID</string>
+    <string name="Password">PW</string>
+    <string name="login">로그인</string>
 
 </resources>
