@@ -1,37 +1,22 @@
 package com.sparcs.nugum;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
-
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.ContentResolver;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.app.Activity;
-import android.content.Intent;
+import android.view.KeyEvent;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
-import android.support.v4.app.NavUtils;
 
 public class LoginActivity extends Activity {
-
 	private EditText textID;
     private EditText textPW;
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,39 +47,46 @@ public class LoginActivity extends Activity {
         return true;
     }
     
-    private void login(String ID,String PW)
-    {
-    	HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost("http://sparcs.org/ssoauth/");
+	@Override   
+	public boolean onKeyDown(int keyCode, KeyEvent event) {    
+	    switch(keyCode){
+	    case KeyEvent.KEYCODE_BACK:
+	    	moveTaskToBack(true);
+	    	finish();
+	    	ActivityManager am=(ActivityManager)getSystemService(ACTIVITY_SERVICE);
+	    	am.restartPackage(getPackageName());
+	    }
+	    return true;
+	}
+	
+	public static boolean checkDeviceID(ContentResolver cr) {
+		String[] name = {"android_id"};
+		String[] data = {Util.getAndroidID(cr)};
+		String result;
+		try {
+			result = Util.Post("http://bit.sparcs.org/~kuss/nugu2.php?action=checkDeviceID", name, data);
+			if (result.equals("Checked")) return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-        try {
-            // Add your data
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-            nameValuePairs.add(new BasicNameValuePair("username", ID));
-            nameValuePairs.add(new BasicNameValuePair("password", PW));
-            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-
-            // Execute HTTP Post Request
-            HttpResponse response = httpclient.execute(httppost);
-            
-            String tmp = EntityUtils.toString(response.getEntity());
-            if (tmp.equals("AuthChecked"))
-            {
-            	Intent intent = new Intent(LoginActivity.this,MainActivity.class);
-				startActivity(intent);
-            }
-            else
-            {
-            	Toast.makeText(LoginActivity.this, "인증에 실패하였습니다.", Toast.LENGTH_SHORT).show();
-            }
-            
-        } catch (ClientProtocolException e) {
-            // TODO Auto-generated catch block
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-        	System.out.println("WTF");
-        }
+		return false;
+	}
+	
+    private void login(String username,String password) {
+    	String[] name = {"username", "password", "android_id"};
+    	String[] data = {username, password, Util.getAndroidID(getContentResolver())};
+    	String result;
+    	
+		try {
+			result = Util.Post("http://bit.sparcs.org/~kuss/nugu2.php?action=registerDeviceID", name, data);
+			Util.toastString(this, result);
+			if (result.equals("AuthChecked")) finish();
+			else Util.toastString(this, "아이디나 비밀번호가 맞지 않습니다.");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
     }
-
     
+  
 }

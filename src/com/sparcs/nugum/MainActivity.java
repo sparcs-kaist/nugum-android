@@ -12,13 +12,11 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
@@ -38,6 +36,13 @@ public class MainActivity<listNames> extends Activity {
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        if (!LoginActivity.checkDeviceID(getContentResolver())) {
+        	Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        	startActivity(intent);
+        }
+        
+        
         setContentView(R.layout.activity_main);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -46,7 +51,7 @@ public class MainActivity<listNames> extends Activity {
         ListView list=(ListView) findViewById(R.id.ListView01);
         final EditText edit = (EditText)findViewById(R.id.EditText01);
 
-        Adapter= new ResultAdapter(this, android.R.layout.simple_list_item_1, listData, false);
+        Adapter = new ResultAdapter(this, android.R.layout.simple_list_item_1, listData, false);
         
         list.setAdapter(Adapter);
         list.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
@@ -103,21 +108,7 @@ public class MainActivity<listNames> extends Activity {
 				inputManager.showSoftInput(edit,0); 
 			}
 		});
-        
-        
     }
-	@Override   
-	public boolean onKeyDown(int keyCode, KeyEvent event) {    
-	    switch(keyCode){
-	    case KeyEvent.KEYCODE_BACK:
-	    	moveTaskToBack(true);
-	    	finish();
-	    	ActivityManager am=(ActivityManager)getSystemService(ACTIVITY_SERVICE);
-	    	am.restartPackage(getPackageName());
-	    }
-	    return true;
-	}
-
 	
 	private void getAddress() {
 		try
