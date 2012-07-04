@@ -12,11 +12,13 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
@@ -101,7 +103,20 @@ public class MainActivity<listNames> extends Activity {
 				inputManager.showSoftInput(edit,0); 
 			}
 		});
+        
+        
     }
+	@Override   
+	public boolean onKeyDown(int keyCode, KeyEvent event) {    
+	    switch(keyCode){
+	    case KeyEvent.KEYCODE_BACK:
+	    	moveTaskToBack(true);
+	    	finish();
+	    	ActivityManager am=(ActivityManager)getSystemService(ACTIVITY_SERVICE);
+	    	am.restartPackage(getPackageName());
+	    }
+	    return true;
+	}
 
 	
 	private void getAddress() {
