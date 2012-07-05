@@ -70,13 +70,13 @@ public class MainActivity<listNames> extends Activity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		this.list.setSelection(position);
+		if (this.list != null) this.list.setSelection(position);
 	}
 	
 	@Override
 	public void onStop() {
 		super.onStop();
-		position = this.list.getFirstVisiblePosition();
+		if (this.list != null) position = this.list.getFirstVisiblePosition();
 	}
 	
 	private void drawListData() {
