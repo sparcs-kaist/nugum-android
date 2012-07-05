@@ -56,7 +56,8 @@ public class IndexBar extends View {
 			if (sectionIndex == null) {
 				sectionIndex = (SectionIndexer) list.getAdapter();
 			}
-			int position = sectionIndex.getPositionForSection(keys[idx].toCharArray()[0]);
+			int position;
+			position = sectionIndex.getPositionForSection(((ResultAdapter)sectionIndex).getSectionForIndex(keys[idx])); // TODO: Code가 독립적이지 않음
 			if (position == -1) {
 				return true;
 			}

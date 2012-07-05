@@ -5,9 +5,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.LinearLayout;
@@ -21,31 +25,38 @@ public class ResultAdapter extends ArrayAdapter<Person> implements SectionIndexe
 	private HashMap<String, Integer> alphaIndexer;
 	private String[] sections;
 	private Filter filter;
+	private int sortConfig;
 	
-	public ResultAdapter(Context context, int textViewResourceId, ArrayList<Person> items) {
+	public ResultAdapter(Context context, int textViewResourceId, ArrayList<Person> items, int sortConfig) {
 		super(context, textViewResourceId, items);
 		this.filtered = items;
 		this.items = (ArrayList<Person>) items.clone();
-		
 		this.context = context;
 		this.filter = new SearchFilter();
-		
+		this.sortConfig = sortConfig;
 		this.alphaIndexer = new HashMap<String, Integer>();
+		
 		for (int i = items.size() - 1; i >= 0; i--) {
 			Person element = items.get(i);
-			char firstChar = element.name.substring(0, 1).toUpperCase()
-					.toCharArray()[0];
-			if (!HangulChecker.isInitialSound(firstChar)
-					&& HangulChecker.isHangul(firstChar)) {
-				firstChar = HangulChecker.getInitialSound(firstChar);
+			
+			if (sortConfig == 1) {
+				char firstChar = element.name.substring(0, 1).toUpperCase().toCharArray()[0];
+				if (!HangulChecker.isInitialSound(firstChar) && HangulChecker.isHangul(firstChar)) {
+					firstChar = HangulChecker.getInitialSound(firstChar);
+				}
+				String firstString = Character.toString(firstChar);
+				alphaIndexer.put(firstString, i);
 			}
-			String firstString = Character.toString(firstChar);
-			alphaIndexer.put(firstString, i);
+			if (sortConfig == 2) {
+				if (!element.num.equals("0"))
+					alphaIndexer.put(element.num, i);
+			}
 		}
 
 		Set<String> keys = alphaIndexer.keySet();
 		ArrayList<String> keyList = new ArrayList<String>(keys);
-		Collections.sort(keyList);
+		if (sortConfig == 1) Collections.sort(keyList, new alphabetComparator());
+		if (sortConfig == 2) Collections.sort(keyList, new studentNumberComparator());
 		sections = new String[keyList.size()];
 		keyList.toArray(sections);
 	}
@@ -53,61 +64,99 @@ public class ResultAdapter extends ArrayAdapter<Person> implements SectionIndexe
 	private void setSection(LinearLayout header, String label) {
 		TextView text = new TextView(context);
 		header.setBackgroundColor(0xffaabbcc);
-		text.setTextColor(Color.WHITE);
-		char firstChar = label.substring(0,1).toUpperCase().toCharArray()[0];
-		if (!HangulChecker.isInitialSound(firstChar) && HangulChecker.isHangul(firstChar)) {
-			firstChar = HangulChecker.getInitialSound(firstChar);
+		text.setTextColor(Color.GRAY);
+		String sectionChar = "";
+		
+		if (sortConfig == 1) {
+			char firstChar = label.substring(0,1).toUpperCase().toCharArray()[0];
+			if (!HangulChecker.isInitialSound(firstChar) && HangulChecker.isHangul(firstChar)) {
+				firstChar = HangulChecker.getInitialSound(firstChar);
+			}
+			sectionChar = Character.toString(firstChar);
 		}
-		text.setText(firstChar);
-		text.setTextSize(26);
+		if (sortConfig == 2) {
+			sectionChar = label; 
+		}
+		text.setText(sectionChar);
+		text.setTextSize(16);
 		text.setPadding(5, 0, 0, 0);
 		text.setGravity(Gravity.CENTER_VERTICAL);
 		header.addView(text);
 	}
-	/*
+	
 	@Override
 	public View getView(int position, View v, ViewGroup parent) {
 		LayoutInflater inflate = ((Activity) context).getLayoutInflater();
 		View view = (View)inflate.inflate(R.layout.result_adapter, null);
 		LinearLayout header = (LinearLayout) view.findViewById(R.id.section);
-		String label = items.get(position).name;
-		char firstChar = label.substring(0,1).toUpperCase().toCharArray()[0];
-		if (!HangulChecker.isInitialSound(firstChar) && HangulChecker.isHangul(firstChar)) {
-			firstChar = HangulChecker.getInitialSound(firstChar);
-		}
-		if(position == 0) {
-		   setSection(header, label);
-		}
-		else {
-			String preLabel = items.get(position-1).name;
-			char prefirstChar = preLabel.substring(0,1).toUpperCase().toCharArray()[0];
+		String label = "";
+		
+		if (sortConfig == 1) {
+			label = items.get(position).name;
+			char firstChar = label.substring(0,1).toUpperCase().toCharArray()[0];
 			if (!HangulChecker.isInitialSound(firstChar) && HangulChecker.isHangul(firstChar)) {
-				prefirstChar = HangulChecker.getInitialSound(firstChar);
+				firstChar = HangulChecker.getInitialSound(firstChar);
 			}
-		    if(firstChar != prefirstChar){
-		    	setSection(header, label);
-		    }else{
-		    	header.setVisibility(View.GONE);
-		    }
+			if(position == 0) {
+				setSection(header, label);
+			}
+			else {
+				String preLabel = items.get(position-1).name;
+				char prefirstChar = preLabel.substring(0,1).toUpperCase().toCharArray()[0];
+				if (!HangulChecker.isInitialSound(prefirstChar) && HangulChecker.isHangul(prefirstChar)) {
+					prefirstChar = HangulChecker.getInitialSound(prefirstChar);
+				}
+				if(firstChar != prefirstChar){
+					setSection(header, label);
+				}else{
+					header.setVisibility(View.GONE);
+				}
+			}
+		}
+		if (sortConfig == 2) {
+			label = items.get(position).num;
+			if(position == 0) {
+				setSection(header, label);
+			}
+			else {
+				String preLabel = items.get(position-1).num;
+				if (!label.equals(preLabel)) {
+					setSection(header, label);
+				}else{
+					header.setVisibility(View.GONE);
+				}
+			}
 		}
 		TextView textView =(TextView)view.findViewById(R.id.textView);
-		textView.setText(label);
+		textView.setText(items.get(position).name);
+		textView.setPadding(10, 25, 0, 25);
 		return view;
-	}*/
+	}
 		  
+	public int getSectionForIndex(String index) {
+		if (sortConfig==1) return index.toCharArray()[0];
+		if (sortConfig==2) return Integer.parseInt(index);
+		return -1;
+	}
+	
 	@Override
 	public int getPositionForSection(int section) {
 		for (int i = 0; i < items.size(); i++) {
 			Person element = items.get(i);
-			char firstChar = element.name.substring(0, 1).toUpperCase().toCharArray()[0];
-			if (!HangulChecker.isInitialSound(firstChar) && HangulChecker.isHangul(firstChar)) {
-				firstChar = HangulChecker.getInitialSound(firstChar);
+			if (sortConfig == 1) {
+				char firstChar = element.name.substring(0, 1).toUpperCase().toCharArray()[0];
+				if (!HangulChecker.isInitialSound(firstChar) && HangulChecker.isHangul(firstChar)) {
+					firstChar = HangulChecker.getInitialSound(firstChar);
+				}
+				if (firstChar == section) return i;
 			}
-			if (firstChar == section) return i;
+			if (sortConfig == 2) {
+				if (Integer.parseInt(element.num) == section) return i;
+			}
 		}
 		return -1;
 	}
-
+	
 	@Override
 	public int getSectionForPosition(int position) {
         return 0;

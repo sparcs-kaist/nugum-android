@@ -84,7 +84,7 @@ public class MainActivity<listNames> extends Activity {
 		final EditText edit = (EditText) findViewById(R.id.EditText01);
 		
 		this.isLoaded = true;
-		Adapter = new ResultAdapter(this,android.R.layout.simple_list_item_1, listData);
+		Adapter = new ResultAdapter(this,android.R.layout.simple_list_item_1, listData, sortConfig);
 		list.setAdapter(Adapter);
 		list.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
 		list.setTextFilterEnabled(true);
@@ -136,23 +136,6 @@ public class MainActivity<listNames> extends Activity {
 		Collections.sort(listData, new alphabetComparator());
 		drawListData();
 	}
-	
-	public class alphabetComparator implements Comparator<Person> {
-		@Override
-		public int compare(Person person1, Person person2) {
-			return person1.name.compareTo(person2.name);
-		}
-	}
-	
-	public class studentNumberComparator implements Comparator<Person> {
-		@Override
-    	public int compare(Person person1, Person person2) {
-    		if (Integer.parseInt(person1.num) < Integer.parseInt(person2.num)) return -1;
-    		if (Integer.parseInt(person1.num) > Integer.parseInt(person2.num)) return 1;
-    		if (person1.name.compareTo(person2.name) > 0) return 1;
-    		return -1;
-    	}
-    }
 	
 	private void drawListDataSortByStudentNumber() {
 		if (!isLoaded)
