@@ -48,6 +48,8 @@ public class MainActivity<listNames> extends Activity {
         	Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         	startActivityForResult(intent, 12);
         }
+        
+        versionCheck();
                
     }
 	
@@ -77,6 +79,20 @@ public class MainActivity<listNames> extends Activity {
 	public void onStop() {
 		super.onStop();
 		if (this.list != null) position = this.list.getFirstVisiblePosition();
+	}
+	
+	private void versionCheck() {
+		String[] name = {"version"};
+		String[] data = {"0.2"};
+		String url = "http://bit.sparcs.org/~kuss/nugu2.php?action=versionCheck";
+		String result;
+		
+		try {
+			result = Util.Post(url, name, data);
+			if (!result.equals("0.2")) Util.toastString(this, "이전 버전입니다."); 
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private void drawListData() {
