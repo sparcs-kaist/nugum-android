@@ -129,7 +129,6 @@ public class PersonActivity extends Activity {
 				    .setNegativeButton("No", dialogClickListener).show();
 			}
 		});
-
     }
 
     @Override

@@ -31,7 +31,6 @@ public class LoginActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				login(textID.getText().toString(), textPW.getText().toString());
 				InputMethodManager inputManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
 				inputManager.hideSoftInputFromWindow(textPW.getWindowToken(),0); 

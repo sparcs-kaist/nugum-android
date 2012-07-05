@@ -14,17 +14,25 @@ public class IndexBar extends View {
 	private String[] keys;
 	private SectionIndexer sectionIndex = null;
 	private ListView list;
+	Paint paint;
 
 	public IndexBar(Context context) {
 		super(context);
+		init();
 	}
 
 	public IndexBar(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		init();
 	}
 
 	public IndexBar(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
+		init();
+	}
+	
+	public void init() {
+		this.paint = new Paint();
 	}
 
 	public void setListView(ListView _list) {
@@ -59,7 +67,6 @@ public class IndexBar extends View {
 
 	// 화면에 세로로 표시될 문자들을 그린다.
 	protected void onDraw(Canvas canvas) {
-		Paint paint = new Paint();
 		paint.setColor(0xFFA6A9AA);
 		paint.setTextSize(30);
 		paint.setTextAlign(Paint.Align.CENTER);

@@ -19,7 +19,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -28,8 +27,11 @@ public class MainActivity<listNames> extends Activity {
 	ArrayList<Person> listData = null;
     ArrayAdapter<Person> Adapter; 
     boolean isLoggedin = true;
+    boolean isLoaded = false;
     int position = 0;
     ListView list;
+    IndexBar indexBar;
+    
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,9 +58,6 @@ public class MainActivity<listNames> extends Activity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		if (!this.isLoggedin) {
-			drawListData();
-		}
 		this.list.setSelection(position);
 	}
 	
@@ -72,14 +71,16 @@ public class MainActivity<listNames> extends Activity {
 		list = (ListView) findViewById(R.id.ListView01);
 		final EditText edit = (EditText) findViewById(R.id.EditText01);
 
-		if (!getAddress())
-			return;
+		if (!isLoaded)
+			if (!getAddress())
+				return;
 		
+		this.isLoaded = true;
 		Adapter = new ResultAdapter(this,android.R.layout.simple_list_item_1, listData);
 		list.setAdapter(Adapter);
 		list.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
 		list.setTextFilterEnabled(true);
-		IndexBar indexBar = (IndexBar) findViewById(R.id.indexbar);
+		indexBar = (IndexBar) findViewById(R.id.indexbar);
 		indexBar.setListView(list);
 
 		list.setOnItemClickListener(new OnItemClickListener() {

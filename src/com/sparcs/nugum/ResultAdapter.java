@@ -5,13 +5,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.LinearLayout;
@@ -133,7 +129,6 @@ public class ResultAdapter extends ArrayAdapter<Person> implements SectionIndexe
 	private class SearchFilter extends Filter {
 		@Override
 		protected FilterResults performFiltering(CharSequence constraint) {
-			// TODO Auto-generated method stub
 			constraint = constraint.toString().toLowerCase();
 			FilterResults result = new FilterResults();
 			if (constraint != null && constraint.toString().length() > 0) {
