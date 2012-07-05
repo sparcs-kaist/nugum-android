@@ -25,35 +25,33 @@ public class ResultAdapter extends ArrayAdapter<Person> implements SectionIndexe
 	private HashMap<String, Integer> alphaIndexer;
 	private String[] sections;
 	private Filter filter;
-	private boolean enableSections;
 	
-	public ResultAdapter(Context context, int textViewResourceId, ArrayList<Person> items, boolean enableSections) {
+	public ResultAdapter(Context context, int textViewResourceId, ArrayList<Person> items) {
 		super(context, textViewResourceId, items);
 		this.filtered = items;
 		this.items = (ArrayList<Person>) items.clone();
 		
 		this.context = context;
 		this.filter = new SearchFilter();
-		this.enableSections = enableSections;
 		
-		if (enableSections) {
-			this.alphaIndexer = new HashMap<String, Integer>();
-			for (int i=items.size()-1;i>=0;i--) {
-				Person element = items.get(i);
-				char firstChar = element.name.substring(0,1).toUpperCase().toCharArray()[0];
-				if (!HangulChecker.isInitialSound(firstChar) && HangulChecker.isHangul(firstChar)) {
-					firstChar = HangulChecker.getInitialSound(firstChar);
-				}
-				String firstString = Character.toString(firstChar);
-				alphaIndexer.put(firstString, i);
+		this.alphaIndexer = new HashMap<String, Integer>();
+		for (int i = items.size() - 1; i >= 0; i--) {
+			Person element = items.get(i);
+			char firstChar = element.name.substring(0, 1).toUpperCase()
+					.toCharArray()[0];
+			if (!HangulChecker.isInitialSound(firstChar)
+					&& HangulChecker.isHangul(firstChar)) {
+				firstChar = HangulChecker.getInitialSound(firstChar);
 			}
-			
-            Set<String> keys = alphaIndexer.keySet();
-            ArrayList<String> keyList = new ArrayList<String>(keys);
-            Collections.sort(keyList);
-            sections = new String[keyList.size()];
-            keyList.toArray(sections);
+			String firstString = Character.toString(firstChar);
+			alphaIndexer.put(firstString, i);
 		}
+
+		Set<String> keys = alphaIndexer.keySet();
+		ArrayList<String> keyList = new ArrayList<String>(keys);
+		Collections.sort(keyList);
+		sections = new String[keyList.size()];
+		keyList.toArray(sections);
 	}
 
 	private void setSection(LinearLayout header, String label) {
@@ -103,28 +101,20 @@ public class ResultAdapter extends ArrayAdapter<Person> implements SectionIndexe
 		  
 	@Override
 	public int getPositionForSection(int section) {
-		if(!enableSections) return 0;
-		if (section == 35) { // 섹션의 아스키값이 35일 경우 0번째를 반환합니다. 아마 특수문자 였던듯 ㅡ.ㅡ;
-			return 0;
-		}
 		for (int i = 0; i < items.size(); i++) {
 			Person element = items.get(i);
 			char firstChar = element.name.substring(0, 1).toUpperCase()
 					.toCharArray()[0];
-			if (!HangulChecker.isInitialSound(firstChar)
-					&& HangulChecker.isHangul(firstChar)) {
+			if (!HangulChecker.isInitialSound(firstChar) && HangulChecker.isHangul(firstChar)) {
 				firstChar = HangulChecker.getInitialSound(firstChar);
 			}
-			if (firstChar == section) {// 첫번째 문자열과 섹션에 표시될 문자열을 비교합니다.
-				return i;// 같다면 해당 인덱스를 반환합니다.
-			}
+			if (firstChar == section) return i;
 		}
 		return -1;
 	}
 
 	@Override
 	public int getSectionForPosition(int position) {
-		if(!enableSections) return 0;
         return 0;
 	}
 

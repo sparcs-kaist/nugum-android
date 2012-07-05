@@ -26,7 +26,10 @@ import com.google.gson.reflect.TypeToken;
 
 public class MainActivity<listNames> extends Activity {
 	ArrayList<Person> listData = null;
-    ArrayAdapter<Person> Adapter;
+    ArrayAdapter<Person> Adapter; 
+    boolean isLoggedin = true;
+    int position = 0;
+    ListView list;
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +37,7 @@ public class MainActivity<listNames> extends Activity {
         StrictMode.setThreadPolicy(policy);
         
         if (!LoginActivity.checkDeviceID(getContentResolver())) {
+        	this.isLoggedin = false;
         	Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         	startActivityForResult(intent, 12);
         }
@@ -41,73 +45,78 @@ public class MainActivity<listNames> extends Activity {
     }
 	
 	@Override
+	public void onStart() {
+		super.onStart();
+		setContentView(R.layout.activity_main);
+		if (this.isLoggedin) {
+			drawListData();
+		}
+	}
+	
+	@Override
 	public void onResume() {
 		super.onResume();
-        setContentView(R.layout.activity_main);
-        
-        if (!getAddress()) return;
-        
-        ListView list=(ListView) findViewById(R.id.ListView01);
-        final EditText edit = (EditText)findViewById(R.id.EditText01);
-        
-        Adapter = new ResultAdapter(this, android.R.layout.simple_list_item_1, listData, true);
-        
-        list.setAdapter(Adapter);
-        list.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
-        list.setTextFilterEnabled(true);
-        
-        IndexBar indexBar = (IndexBar) findViewById(R.id.indexbar);
-        indexBar.setListView(list);
-        
-        list.setOnItemClickListener(new OnItemClickListener() {
+		if (!this.isLoggedin) {
+			drawListData();
+		}
+		this.list.setSelection(position);
+	}
+	
+	@Override
+	public void onStop() {
+		super.onStop();
+		position = this.list.getFirstVisiblePosition();
+	}
+	
+	public void drawListData() {
+		list = (ListView) findViewById(R.id.ListView01);
+		final EditText edit = (EditText) findViewById(R.id.EditText01);
+
+		if (!getAddress())
+			return;
+		
+		Adapter = new ResultAdapter(this,android.R.layout.simple_list_item_1, listData);
+		list.setAdapter(Adapter);
+		list.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
+		list.setTextFilterEnabled(true);
+		IndexBar indexBar = (IndexBar) findViewById(R.id.indexbar);
+		indexBar.setListView(list);
+
+		list.setOnItemClickListener(new OnItemClickListener() {
 			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int position,long arg3) {
-				InputMethodManager inputManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-				inputManager.hideSoftInputFromWindow(edit.getWindowToken(),0); 
-			
+			public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
+				InputMethodManager inputManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+				inputManager.hideSoftInputFromWindow(edit.getWindowToken(),0);
+
 				Intent intent = new Intent(MainActivity.this,PersonActivity.class);
 				Person selectedPerson = Adapter.getItem(position);
 				intent.putExtra("name", selectedPerson.name);
 				intent.putExtra("pager", selectedPerson.pager);
-				intent.putExtra("sparcsID",selectedPerson.id);
+				intent.putExtra("sparcsID", selectedPerson.id);
 				intent.putExtra("email", selectedPerson.email);
 				startActivity(intent);
 			};
 		});
-        
-        
-        edit.addTextChangedListener(new TextWatcher()
-        {
-           @Override
-           public void onTextChanged( CharSequence s, int start, int count, int after)
-           {
-               // TODO Auto-generated method stub
-        	   Adapter.getFilter().filter(s);
-           }
 
-           @Override
-           public void beforeTextChanged( CharSequence arg0, int arg1, int arg2, int arg3)
-           {
-               // TODO Auto-generated method stub
-
-           }
-
-           @Override
-           public void afterTextChanged( Editable arg0)
-           {
-               // TODO Auto-generated method stub
-           }
-        });
-        edit.setOnClickListener(new OnClickListener() {
-			
+		edit.addTextChangedListener(new TextWatcher() {
 			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				InputMethodManager inputManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-				inputManager.showSoftInput(edit,0); 
+			public void onTextChanged(CharSequence s, int start, int count, int after) {
+				Adapter.getFilter().filter(s);
+			}
+			@Override
+			public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+			}
+			@Override
+			public void afterTextChanged(Editable arg0) {
 			}
 		});
-
+		edit.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				InputMethodManager inputManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+				inputManager.showSoftInput(edit, 0);
+			}
+		});
 	}
 	
 	private boolean getAddress() {
@@ -133,6 +142,9 @@ public class MainActivity<listNames> extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch(resultCode) {
+		case 1:
+			this.isLoggedin = true;
+			break;
 		case 2:
 			finish();
 			break;

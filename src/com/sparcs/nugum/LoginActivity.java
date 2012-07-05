@@ -52,10 +52,6 @@ public class LoginActivity extends Activity {
 	    case KeyEvent.KEYCODE_BACK:
 	    	setResult(2);
 	    	finish();
-	    	//super.onActivityResult(2, 2, null);
-	    	//moveTaskToBack(true);
-	    	//ActivityManager am=(ActivityManager)getSystemService(ACTIVITY_SERVICE);
-	    	//am.restartPackage(getPackageName());
 	    }
 	    return true;
 	}
@@ -81,8 +77,10 @@ public class LoginActivity extends Activity {
     	
 		try {
 			result = Util.Post("http://bit.sparcs.org/~kuss/nugu2.php?action=registerDeviceID", name, data);
-			Util.toastString(this, result);
-			if (result.equals("AuthChecked")) finish();
+			if (result.equals("AuthChecked")) {
+				setResult(1);
+				finish();
+			}
 			else Util.toastString(this, "아이디나 비밀번호가 맞지 않습니다.");
 		} catch (Exception e) {
 			e.printStackTrace();
