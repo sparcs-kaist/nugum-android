@@ -53,7 +53,7 @@ public class LoginActivity extends Activity {
 	    	setResult(2);
 	    	finish();
 	    	//super.onActivityResult(2, 2, null);
-	    	moveTaskToBack(true);
+	    	//moveTaskToBack(true);
 	    	//ActivityManager am=(ActivityManager)getSystemService(ACTIVITY_SERVICE);
 	    	//am.restartPackage(getPackageName());
 	    }
