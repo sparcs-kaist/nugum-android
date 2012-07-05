@@ -36,16 +36,16 @@ public class MainActivity<listNames> extends Activity {
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
         
         if (!LoginActivity.checkDeviceID(getContentResolver())) {
         	Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-        	startActivity(intent);
+        	startActivityForResult(intent, 12);
         }
         
         
         setContentView(R.layout.activity_main);
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
         getAddress();
         
         ListView list=(ListView) findViewById(R.id.ListView01);
@@ -132,6 +132,15 @@ public class MainActivity<listNames> extends Activity {
 		{
 		        //e.printStackTrace();
 		        Toast.makeText(MainActivity.this, "네트워크 연결상태가 좋지 않습니다.", Toast.LENGTH_SHORT).show();
+		}
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch(resultCode) {
+		case 2:
+			finish();
+			break;
 		}
 	}
 

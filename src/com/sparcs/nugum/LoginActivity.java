@@ -51,10 +51,12 @@ public class LoginActivity extends Activity {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {    
 	    switch(keyCode){
 	    case KeyEvent.KEYCODE_BACK:
-	    	moveTaskToBack(true);
+	    	setResult(2);
 	    	finish();
-	    	ActivityManager am=(ActivityManager)getSystemService(ACTIVITY_SERVICE);
-	    	am.restartPackage(getPackageName());
+	    	//super.onActivityResult(2, 2, null);
+	    	moveTaskToBack(true);
+	    	//ActivityManager am=(ActivityManager)getSystemService(ACTIVITY_SERVICE);
+	    	//am.restartPackage(getPackageName());
 	    }
 	    return true;
 	}
