@@ -27,10 +27,10 @@ public class ResultAdapter extends ArrayAdapter<Person> implements SectionIndexe
 	private Filter filter;
 	private int sortConfig;
 	
-	public ResultAdapter(Context context, int textViewResourceId, ArrayList<Person> items, int sortConfig) {
-		super(context, textViewResourceId, items);
-		this.filtered = items;
-		this.items = (ArrayList<Person>) items.clone();
+	public ResultAdapter(Context context, int textViewResourceId, ArrayList<Person> filtered, int sortConfig) {
+		super(context, textViewResourceId, filtered);
+		this.filtered = filtered;
+		this.items = (ArrayList<Person>) filtered.clone();
 		this.context = context;
 		this.filter = new SearchFilter();
 		this.sortConfig = sortConfig;
@@ -92,7 +92,7 @@ public class ResultAdapter extends ArrayAdapter<Person> implements SectionIndexe
 		String label = "";
 		
 		if (sortConfig == 1) {
-			label = items.get(position).name;
+			label = filtered.get(position).name;
 			char firstChar = label.substring(0,1).toUpperCase().toCharArray()[0];
 			if (!HangulChecker.isInitialSound(firstChar) && HangulChecker.isHangul(firstChar)) {
 				firstChar = HangulChecker.getInitialSound(firstChar);
@@ -101,7 +101,7 @@ public class ResultAdapter extends ArrayAdapter<Person> implements SectionIndexe
 				setSection(header, label);
 			}
 			else {
-				String preLabel = items.get(position-1).name;
+				String preLabel = filtered.get(position-1).name;
 				char prefirstChar = preLabel.substring(0,1).toUpperCase().toCharArray()[0];
 				if (!HangulChecker.isInitialSound(prefirstChar) && HangulChecker.isHangul(prefirstChar)) {
 					prefirstChar = HangulChecker.getInitialSound(prefirstChar);
@@ -114,12 +114,12 @@ public class ResultAdapter extends ArrayAdapter<Person> implements SectionIndexe
 			}
 		}
 		if (sortConfig == 2) {
-			label = items.get(position).num;
+			label = filtered.get(position).num;
 			if(position == 0) {
 				setSection(header, label);
 			}
 			else {
-				String preLabel = items.get(position-1).num;
+				String preLabel = filtered.get(position-1).num;
 				if (!label.equals(preLabel)) {
 					setSection(header, label);
 				}else{
@@ -128,10 +128,40 @@ public class ResultAdapter extends ArrayAdapter<Person> implements SectionIndexe
 			}
 		}
 		TextView textView =(TextView)view.findViewById(R.id.textView);
-		textView.setText(items.get(position).name);
+		textView.setText(filtered.get(position).name);
 		textView.setPadding(10, 25, 0, 25);
 		return view;
 	}
+	
+    @Override
+    public void notifyDataSetInvalidated()
+    {
+        for (int i = filtered.size() - 1; i >= 0; i--) {
+			Person element = filtered.get(i);
+			
+			if (sortConfig == 1) {
+				char firstChar = element.name.substring(0, 1).toUpperCase().toCharArray()[0];
+				if (!HangulChecker.isInitialSound(firstChar) && HangulChecker.isHangul(firstChar)) {
+					firstChar = HangulChecker.getInitialSound(firstChar);
+				}
+				String firstString = Character.toString(firstChar);
+				alphaIndexer.put(firstString, i);
+			}
+			if (sortConfig == 2) {
+				if (!element.num.equals("0") && Integer.parseInt(element.num)%2==0)
+					alphaIndexer.put(element.num, i);
+			}
+        }
+
+        Set<String> keys = alphaIndexer.keySet();
+		ArrayList<String> keyList = new ArrayList<String>(keys);
+		if (sortConfig == 1) Collections.sort(keyList, new alphabetComparator());
+		if (sortConfig == 2) Collections.sort(keyList, new studentNumberComparator());
+		sections = new String[keyList.size()];
+		keyList.toArray(sections);
+
+        super.notifyDataSetInvalidated();
+    }
 		  
 	public int getSectionForIndex(String index) {
 		if (sortConfig==1) return index.toCharArray()[0];
@@ -141,8 +171,8 @@ public class ResultAdapter extends ArrayAdapter<Person> implements SectionIndexe
 	
 	@Override
 	public int getPositionForSection(int section) {
-		for (int i = 0; i < items.size(); i++) {
-			Person element = items.get(i);
+		for (int i = 0; i < filtered.size(); i++) {
+			Person element = filtered.get(i);
 			if (sortConfig == 1) {
 				char firstChar = element.name.substring(0, 1).toUpperCase().toCharArray()[0];
 				if (!HangulChecker.isInitialSound(firstChar) && HangulChecker.isHangul(firstChar)) {
@@ -176,6 +206,7 @@ public class ResultAdapter extends ArrayAdapter<Person> implements SectionIndexe
 	private class SearchFilter extends Filter {
 		@Override
 		protected FilterResults performFiltering(CharSequence constraint) {
+			filtered = (ArrayList<Person>)items.clone();
 			constraint = constraint.toString().toLowerCase();
 			FilterResults result = new FilterResults();
 			if (constraint != null && constraint.toString().length() > 0) {
@@ -205,7 +236,7 @@ public class ResultAdapter extends ArrayAdapter<Person> implements SectionIndexe
             filtered = (ArrayList<Person>)results.values;
             notifyDataSetChanged();
             clear();
-            for(int i = 0, l = filtered.size(); i < l; i++)
+            for(int i = 0;i<filtered.size();i++)
                 add(filtered.get(i));
             notifyDataSetInvalidated();
 		}
