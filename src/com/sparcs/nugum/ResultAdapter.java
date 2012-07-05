@@ -48,7 +48,7 @@ public class ResultAdapter extends ArrayAdapter<Person> implements SectionIndexe
 				alphaIndexer.put(firstString, i);
 			}
 			if (sortConfig == 2) {
-				if (!element.num.equals("0"))
+				if (!element.num.equals("0") && Integer.parseInt(element.num)%2==0)
 					alphaIndexer.put(element.num, i);
 			}
 		}
