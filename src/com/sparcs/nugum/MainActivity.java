@@ -4,13 +4,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,6 +13,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -31,7 +25,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 public class MainActivity<listNames> extends Activity {
-	ArrayList<Person> listData;
+	ArrayList<Person> listData = null;
     ArrayAdapter<Person> Adapter;
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,18 +37,23 @@ public class MainActivity<listNames> extends Activity {
         	Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         	startActivityForResult(intent, 12);
         }
-        
-        
+               
+    }
+	
+	@Override
+	public void onResume() {
+		super.onResume();
         setContentView(R.layout.activity_main);
-        getAddress();
+        
+        if (!getAddress()) return;
         
         ListView list=(ListView) findViewById(R.id.ListView01);
         final EditText edit = (EditText)findViewById(R.id.EditText01);
-
+        
         Adapter = new ResultAdapter(this, android.R.layout.simple_list_item_1, listData, false);
         
         list.setAdapter(Adapter);
-        list.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        list.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
         list.setTextFilterEnabled(true);
         list.setOnItemClickListener(new OnItemClickListener() {
 
@@ -108,31 +107,27 @@ public class MainActivity<listNames> extends Activity {
 				inputManager.showSoftInput(edit,0); 
 			}
 		});
-    }
+
+	}
 	
-	private void getAddress() {
-		try
-		{
-		        HttpClient client = new DefaultHttpClient();  
-		        String getURL = "http://bit.sparcs.org/~rodumani/nugu.php?key=asdf";
-		        HttpGet get = new HttpGet(getURL);
-		        HttpResponse responseGet = client.execute(get);  
-		        HttpEntity resEntityGet = responseGet.getEntity();
-		     
-		        if (resEntityGet != null)
-		        {  
-		            // 결과를 처리합니다.
-		        	Gson gson = new Gson();
-		        	Type type = new TypeToken<List<Person>>(){}.getType();
-		        	String jsonString = EntityUtils.toString(resEntityGet);
-		        	listData=gson.fromJson(jsonString,type);
-		        }
+	private boolean getAddress() {
+		String[] name = {"android_id"};
+		String[] data = {Util.getAndroidID(getContentResolver())};
+		String url = "http://bit.sparcs.org/~kuss/nugu2.php?action=getContact";
+		String result;
+		
+		try {
+			result = Util.Post(url, name, data);
+		    if (!result.equals("404")) {  
+		      	Gson gson = new Gson();
+		       	Type type = new TypeToken<List<Person>>(){}.getType();
+		       	listData=gson.fromJson(result,type);
+		       	return true;
+		    }
+		} catch (Exception e) {
+		    Util.toastString(this, "네트워크 연결상태가 좋지 않습니다.");
 		}
-		catch (Exception e)
-		{
-		        //e.printStackTrace();
-		        Toast.makeText(MainActivity.this, "네트워크 연결상태가 좋지 않습니다.", Toast.LENGTH_SHORT).show();
-		}
+		return false;
 	}
 	
 	@Override

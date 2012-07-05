@@ -19,6 +19,7 @@ public class Person {
 	String msn;
 	String blog;
 	
+	@Override
 	public String toString()
 	{
 		return name;

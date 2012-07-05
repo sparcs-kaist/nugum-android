@@ -1,7 +1,6 @@
 package com.sparcs.nugum;
 
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.content.ContentResolver;
 import android.os.Bundle;
 import android.os.StrictMode;
