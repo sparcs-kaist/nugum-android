@@ -50,17 +50,18 @@ public class MainActivity<listNames> extends Activity {
         ListView list=(ListView) findViewById(R.id.ListView01);
         final EditText edit = (EditText)findViewById(R.id.EditText01);
         
-        Adapter = new ResultAdapter(this, android.R.layout.simple_list_item_1, listData, false);
+        Adapter = new ResultAdapter(this, android.R.layout.simple_list_item_1, listData, true);
         
         list.setAdapter(Adapter);
         list.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
         list.setTextFilterEnabled(true);
+        
+        IndexBar indexBar = (IndexBar) findViewById(R.id.indexbar);
+        indexBar.setListView(list);
+        
         list.setOnItemClickListener(new OnItemClickListener() {
-
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int position,long arg3) {
-					
-				
 				InputMethodManager inputManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
 				inputManager.hideSoftInputFromWindow(edit.getWindowToken(),0); 
 			
@@ -72,7 +73,6 @@ public class MainActivity<listNames> extends Activity {
 				intent.putExtra("email", selectedPerson.email);
 				startActivity(intent);
 			};
-        	
 		});
         
         

@@ -14,7 +14,9 @@ import org.apache.http.util.EntityUtils;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.res.Resources;
 import android.provider.Settings.Secure;
+import android.util.DisplayMetrics;
 import android.widget.Toast;
 
 
@@ -41,5 +43,17 @@ public final class Util {
     }
     public static void toastString(Context c, String s) {
     	Toast.makeText(c, s, Toast.LENGTH_SHORT).show();
+    }
+    public static float convertDpToPixel(float dp,Context context){
+        Resources resources = context.getResources();
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        float px = dp * (metrics.densityDpi/160f);
+        return px;
+    }
+    public static float convertPixelsToDp(float px,Context context){
+        Resources resources = context.getResources();
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        float dp = px / (metrics.densityDpi/160f);
+        return dp;
     }
 }

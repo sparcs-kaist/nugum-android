@@ -3,20 +3,27 @@ package com.sparcs.nugum;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Set;
 
+import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
+import android.widget.LinearLayout;
 import android.widget.SectionIndexer;
+import android.widget.TextView;
 
 public class ResultAdapter extends ArrayAdapter<Person> implements SectionIndexer {
 	public ArrayList<Person> items;
 	public ArrayList<Person> filtered;
 	private Context context;
 	private HashMap<String, Integer> alphaIndexer;
-	private String[] sections = new String[0];
+	private String[] sections;
 	private Filter filter;
 	private boolean enableSections;
 	
@@ -33,74 +40,92 @@ public class ResultAdapter extends ArrayAdapter<Person> implements SectionIndexe
 			this.alphaIndexer = new HashMap<String, Integer>();
 			for (int i=items.size()-1;i>=0;i--) {
 				Person element = items.get(i);
-				String firstChar = element.name.substring(0,1).toUpperCase();
-				alphaIndexer.put(firstChar, i);
+				char firstChar = element.name.substring(0,1).toUpperCase().toCharArray()[0];
+				if (!HangulChecker.isInitialSound(firstChar) && HangulChecker.isHangul(firstChar)) {
+					firstChar = HangulChecker.getInitialSound(firstChar);
+				}
+				String firstString = Character.toString(firstChar);
+				alphaIndexer.put(firstString, i);
 			}
 			
             Set<String> keys = alphaIndexer.keySet();
-            Iterator<String> it = keys.iterator();
-            ArrayList<String> keyList = new ArrayList<String>();
-            while(it.hasNext())
-                keyList.add(it.next());
-
+            ArrayList<String> keyList = new ArrayList<String>(keys);
             Collections.sort(keyList);
             sections = new String[keyList.size()];
             keyList.toArray(sections);
 		}
 	}
-	
-    @Override
-    public void notifyDataSetInvalidated()
-    {
-        if(enableSections)
-        {
-            for (int i = items.size() - 1; i >= 0; i--)
-            {
-                Person element = items.get(i);
-                String firstChar = element.name.substring(0, 1).toUpperCase();
-                if(firstChar.charAt(0) > 'Z' || firstChar.charAt(0) < 'A')
-                    firstChar = "@";
-                alphaIndexer.put(firstChar, i);
-            }
 
-            Set<String> keys = alphaIndexer.keySet();
-            Iterator<String> it = keys.iterator();
-            ArrayList<String> keyList = new ArrayList<String>();
-            while (it.hasNext())
-            {
-                keyList.add(it.next());
-            }
-
-            Collections.sort(keyList);
-            sections = new String[keyList.size()];
-            keyList.toArray(sections);
-
-            super.notifyDataSetInvalidated();
-        }
-    }
-    
+	private void setSection(LinearLayout header, String label) {
+		TextView text = new TextView(context);
+		header.setBackgroundColor(0xffaabbcc);
+		text.setTextColor(Color.WHITE);
+		char firstChar = label.substring(0,1).toUpperCase().toCharArray()[0];
+		if (!HangulChecker.isInitialSound(firstChar) && HangulChecker.isHangul(firstChar)) {
+			firstChar = HangulChecker.getInitialSound(firstChar);
+		}
+		text.setText(firstChar);
+		text.setTextSize(26);
+		text.setPadding(5, 0, 0, 0);
+		text.setGravity(Gravity.CENTER_VERTICAL);
+		header.addView(text);
+	}
+	/*
+	@Override
+	public View getView(int position, View v, ViewGroup parent) {
+		LayoutInflater inflate = ((Activity) context).getLayoutInflater();
+		View view = (View)inflate.inflate(R.layout.result_adapter, null);
+		LinearLayout header = (LinearLayout) view.findViewById(R.id.section);
+		String label = items.get(position).name;
+		char firstChar = label.substring(0,1).toUpperCase().toCharArray()[0];
+		if (!HangulChecker.isInitialSound(firstChar) && HangulChecker.isHangul(firstChar)) {
+			firstChar = HangulChecker.getInitialSound(firstChar);
+		}
+		if(position == 0) {
+		   setSection(header, label);
+		}
+		else {
+			String preLabel = items.get(position-1).name;
+			char prefirstChar = preLabel.substring(0,1).toUpperCase().toCharArray()[0];
+			if (!HangulChecker.isInitialSound(firstChar) && HangulChecker.isHangul(firstChar)) {
+				prefirstChar = HangulChecker.getInitialSound(firstChar);
+			}
+		    if(firstChar != prefirstChar){
+		    	setSection(header, label);
+		    }else{
+		    	header.setVisibility(View.GONE);
+		    }
+		}
+		TextView textView =(TextView)view.findViewById(R.id.textView);
+		textView.setText(label);
+		return view;
+	}*/
+		  
 	@Override
 	public int getPositionForSection(int section) {
-        if(!enableSections) return 0;
-        String letter = sections[section];
-
-        return alphaIndexer.get(letter);
+		if(!enableSections) return 0;
+		if (section == 35) { // 섹션의 아스키값이 35일 경우 0번째를 반환합니다. 아마 특수문자 였던듯 ㅡ.ㅡ;
+			return 0;
+		}
+		for (int i = 0; i < items.size(); i++) {
+			Person element = items.get(i);
+			char firstChar = element.name.substring(0, 1).toUpperCase()
+					.toCharArray()[0];
+			if (!HangulChecker.isInitialSound(firstChar)
+					&& HangulChecker.isHangul(firstChar)) {
+				firstChar = HangulChecker.getInitialSound(firstChar);
+			}
+			if (firstChar == section) {// 첫번째 문자열과 섹션에 표시될 문자열을 비교합니다.
+				return i;// 같다면 해당 인덱스를 반환합니다.
+			}
+		}
+		return -1;
 	}
 
 	@Override
 	public int getSectionForPosition(int position) {
-        if(!enableSections) return 0;
-        int prevIndex = 0;
-        for(int i = 0; i < sections.length; i++)
-        {
-            if(getPositionForSection(i) > position && prevIndex <= position)
-            {
-                prevIndex = i;
-                break;
-            }
-            prevIndex = i;
-        }
-        return prevIndex;
+		if(!enableSections) return 0;
+        return 0;
 	}
 
 	@Override
@@ -129,7 +154,7 @@ public class ResultAdapter extends ArrayAdapter<Person> implements SectionIndexe
 				}
 				for (int i = 0, l = lItems.size(); i < l; i++) {
 					Person m = lItems.get(i);
-					if (matchString(m.name, constraint.toString()))
+					if (HangulChecker.matchString(m.name, constraint.toString()))
 						filt.add(m);
 				}
 				result.count = filt.size();
@@ -152,16 +177,18 @@ public class ResultAdapter extends ArrayAdapter<Person> implements SectionIndexe
                 add(filtered.get(i));
             notifyDataSetInvalidated();
 		}
-
+	}
+	
+	private static class HangulChecker {
 		// www.roter.pe.kr
-		private char HANGUL_BEGIN_UNICODE = 44032; // 가
-		private char HANGUL_LAST_UNICODE = 55203; // 힣
-		private char HANGUL_BASE_UNIT = 588;// 각자음 마다 가지는 글자수
+		private static char HANGUL_BEGIN_UNICODE = 44032; // 가
+		private static char HANGUL_LAST_UNICODE = 55203; // 힣
+		private static char HANGUL_BASE_UNIT = 588;// 각자음 마다 가지는 글자수
 		// 자음
-		private char[] INITIAL_SOUND = { 'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ',
+		private static char[] INITIAL_SOUND = { 'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ',
 				'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ' };
 
-		private boolean isInitialSound(char searchar) {
+		public static boolean isInitialSound(char searchar) {
 			for (char c : INITIAL_SOUND) {
 				if (c == searchar) {
 					return true;
@@ -170,47 +197,35 @@ public class ResultAdapter extends ArrayAdapter<Person> implements SectionIndexe
 			return false;
 		}
 
-		private char getInitialSound(char c) {
+		public static char getInitialSound(char c) {
 			int hanBegin = (c - HANGUL_BEGIN_UNICODE);
 			int index = hanBegin / HANGUL_BASE_UNIT;
 			return INITIAL_SOUND[index];
 		}
 
-		private boolean isHangul(char c) {
+		public static boolean isHangul(char c) {
 			return HANGUL_BEGIN_UNICODE <= c && c <= HANGUL_LAST_UNICODE;
 		}
 
-		private boolean matchString(String value, String search) {
+		public static boolean matchString(String value, String search) {
 			int t = 0;
 			int seof = value.length() - search.length();
 			int slen = search.length();
-			if (seof < 0)
-				return false; // 검색어가 더 길면 false를 리턴한다.
+			if (seof < 0) return false; 
 			for (int i = 0; i <= seof; i++) {
 				t = 0;
 				while (t < slen) {
-					if (isInitialSound(search.charAt(t)) == true
-							&& isHangul(value.charAt(i + t))) {
-						// 만약 현재 char이 초성이고 value가 한글이면
-						if (getInitialSound(value.charAt(i + t)) == search
-								.charAt(t))
-							// 각각의 초성끼리 같은지 비교한다
-							t++;
-						else
-							break;
+					if (isInitialSound(search.charAt(t)) == true && isHangul(value.charAt(i + t))) {
+						if (getInitialSound(value.charAt(i + t)) == search.charAt(t)) t++;
+						else break;
 					} else {
-						// char이 초성이 아니라면
-						if (value.charAt(i + t) == search.charAt(t))
-							// 그냥 같은지 비교한다.
-							t++;
-						else
-							break;
+						if (value.charAt(i + t) == search.charAt(t)) t++;
+						else break;
 					}
 				}
-				if (t == slen)
-					return true; // 모두 일치한 결과를 찾으면 true를 리턴한다.
+				if (t == slen) return true; 
 			}
-			return false; // 일치하는 것을 찾지 못했으면 false를 리턴한다.
+			return false; 
 		}
 	}
 
