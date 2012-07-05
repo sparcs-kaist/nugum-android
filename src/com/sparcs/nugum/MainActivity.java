@@ -2,6 +2,8 @@ package com.sparcs.nugum;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import android.app.Activity;
@@ -10,6 +12,8 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
@@ -29,6 +33,7 @@ public class MainActivity<listNames> extends Activity {
     boolean isLoggedin = true;
     boolean isLoaded = false;
     int position = 0;
+    int sortConfig = 1;
     ListView list;
     IndexBar indexBar;
     
@@ -51,7 +56,14 @@ public class MainActivity<listNames> extends Activity {
 		super.onStart();
 		setContentView(R.layout.activity_main);
 		if (this.isLoggedin) {
-			drawListData();
+			switch (sortConfig) {
+			case 1:
+				drawListDataSortByAlphabet();
+				break;
+			case 2:
+				drawListDataSortByStudentNumber();
+				break;
+			}
 		}
 	}
 	
@@ -67,13 +79,9 @@ public class MainActivity<listNames> extends Activity {
 		position = this.list.getFirstVisiblePosition();
 	}
 	
-	public void drawListData() {
+	private void drawListData() {
 		list = (ListView) findViewById(R.id.ListView01);
 		final EditText edit = (EditText) findViewById(R.id.EditText01);
-
-		if (!isLoaded)
-			if (!getAddress())
-				return;
 		
 		this.isLoaded = true;
 		Adapter = new ResultAdapter(this,android.R.layout.simple_list_item_1, listData);
@@ -120,6 +128,41 @@ public class MainActivity<listNames> extends Activity {
 		});
 	}
 	
+	private void drawListDataSortByAlphabet() {
+		if (!isLoaded)
+			if (!getAddress())
+				return;
+		
+		Collections.sort(listData, new alphabetComparator());
+		drawListData();
+	}
+	
+	public class alphabetComparator implements Comparator<Person> {
+		@Override
+		public int compare(Person person1, Person person2) {
+			return person1.name.compareTo(person2.name);
+		}
+	}
+	
+	public class studentNumberComparator implements Comparator<Person> {
+		@Override
+    	public int compare(Person person1, Person person2) {
+    		if (Integer.parseInt(person1.num) < Integer.parseInt(person2.num)) return -1;
+    		if (Integer.parseInt(person1.num) > Integer.parseInt(person2.num)) return 1;
+    		if (person1.name.compareTo(person2.name) > 0) return 1;
+    		return -1;
+    	}
+    }
+	
+	private void drawListDataSortByStudentNumber() {
+		if (!isLoaded)
+			if (!getAddress())
+				return;
+		
+		Collections.sort(listData, new studentNumberComparator());
+		drawListData();
+	}
+	
 	private boolean getAddress() {
 		String[] name = {"android_id"};
 		String[] data = {Util.getAndroidID(getContentResolver())};
@@ -150,6 +193,27 @@ public class MainActivity<listNames> extends Activity {
 			finish();
 			break;
 		}
+	}
+	
+	@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_main, menu);
+        return true;
+    }
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.menu_sortbyStudentNumber:
+			sortConfig = 2;
+			drawListDataSortByStudentNumber();
+			break;
+		case R.id.menu_sortbyAlphabet:
+			sortConfig = 1;
+			drawListDataSortByAlphabet();
+			break;
+		}
+		return true;
 	}
 
 }

@@ -131,12 +131,6 @@ public class PersonActivity extends Activity {
 		});
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_person, menu);
-        return true;
-    }
-
 	private void call(String phonenum){
 		try{
 			Intent callIntent = new Intent(Intent.ACTION_CALL);

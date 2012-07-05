@@ -1,5 +1,4 @@
 <resources>
-
     <string name="app_name">Nugum</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
@@ -12,5 +11,6 @@
     <string name="ID">ID</string>
     <string name="Password">PW</string>
     <string name="login">로그인</string>
-
+    <string name="menu_string_sortbyStudentNumber">학번순 보기</string>
+    <string name="menu_string_sortbyAlphabet">이름순 보기</string>
 </resources>

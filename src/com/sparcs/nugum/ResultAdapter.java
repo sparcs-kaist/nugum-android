@@ -99,8 +99,7 @@ public class ResultAdapter extends ArrayAdapter<Person> implements SectionIndexe
 	public int getPositionForSection(int section) {
 		for (int i = 0; i < items.size(); i++) {
 			Person element = items.get(i);
-			char firstChar = element.name.substring(0, 1).toUpperCase()
-					.toCharArray()[0];
+			char firstChar = element.name.substring(0, 1).toUpperCase().toCharArray()[0];
 			if (!HangulChecker.isInitialSound(firstChar) && HangulChecker.isHangul(firstChar)) {
 				firstChar = HangulChecker.getInitialSound(firstChar);
 			}
@@ -124,7 +123,6 @@ public class ResultAdapter extends ArrayAdapter<Person> implements SectionIndexe
 		if (this.filter==null) filter = new SearchFilter();
 		return filter;
 	}
-	
 	
 	private class SearchFilter extends Filter {
 		@Override

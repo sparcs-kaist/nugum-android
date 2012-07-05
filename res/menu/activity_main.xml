@@ -1,5 +1,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/menu_settings"
-        android:title="@string/menu_settings"
+    <item android:id="@+id/menu_sortbyAlphabet"
+        android:title="@string/menu_string_sortbyAlphabet"
+        android:orderInCategory="100" />
+    <item android:id="@+id/menu_sortbyStudentNumber"
+        android:title="@string/menu_string_sortbyStudentNumber"
         android:orderInCategory="100" />
 </menu>
