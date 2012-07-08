@@ -29,6 +29,8 @@ import com.google.gson.reflect.TypeToken;
 
 public class MainActivity<listNames> extends Activity {
 	ArrayList<Person> listData = null;
+	ArrayList<Person> origData = null;
+	String restoreSearchKey = "";
     ArrayAdapter<Person> Adapter; 
     boolean isLoggedin = true;
     boolean isLoaded = false;
@@ -57,6 +59,19 @@ public class MainActivity<listNames> extends Activity {
 	public void onStart() {
 		super.onStart();
 		setContentView(R.layout.activity_main);
+		if (!isLoaded) {
+			if (getAddress()) isLoaded = true;
+		}
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		if (this.list != null) this.list.setSelection(position);
+		((EditText)findViewById(R.id.EditText01)).setText(restoreSearchKey);
+		if (origData != null) {
+			listData = (ArrayList<Person>) origData.clone();
+		}
 		if (this.isLoggedin) {
 			switch (sortConfig) {
 			case 1:
@@ -67,18 +82,14 @@ public class MainActivity<listNames> extends Activity {
 				break;
 			}
 		}
-	}
-	
-	@Override
-	public void onResume() {
-		super.onResume();
-		if (this.list != null) this.list.setSelection(position);
+		Adapter.getFilter().filter(restoreSearchKey);
 	}
 	
 	@Override
 	public void onStop() {
 		super.onStop();
 		if (this.list != null) position = this.list.getFirstVisiblePosition();
+		restoreSearchKey = ((EditText)findViewById(R.id.EditText01)).getText().toString();
 	}
 	
 	private void versionCheck() {
@@ -99,7 +110,6 @@ public class MainActivity<listNames> extends Activity {
 		list = (ListView) findViewById(R.id.ListView01);
 		final EditText edit = (EditText) findViewById(R.id.EditText01);
 		
-		this.isLoaded = true;
 		Adapter = new ResultAdapter(this,android.R.layout.simple_list_item_1, listData, sortConfig);
 		list.setAdapter(Adapter);
 		list.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
@@ -145,19 +155,11 @@ public class MainActivity<listNames> extends Activity {
 	}
 	
 	private void drawListDataSortByAlphabet() {
-		if (!isLoaded)
-			if (!getAddress())
-				return;
-		
 		Collections.sort(listData, new alphabetComparator());
 		drawListData();
 	}
 	
 	private void drawListDataSortByStudentNumber() {
-		if (!isLoaded)
-			if (!getAddress())
-				return;
-		
 		Collections.sort(listData, new studentNumberComparator());
 		drawListData();
 	}
@@ -174,6 +176,7 @@ public class MainActivity<listNames> extends Activity {
 		      	Gson gson = new Gson();
 		       	Type type = new TypeToken<List<Person>>(){}.getType();
 		       	listData=gson.fromJson(result,type);
+		       	origData=(ArrayList<Person>)listData.clone();
 		       	return true;
 		    }
 		} catch (Exception e) {
