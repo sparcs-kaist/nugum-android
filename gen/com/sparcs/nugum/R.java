@@ -25,18 +25,24 @@ public final class R {
         public static final int LoginActivityBT=0x7f080002;
         public static final int LoginActivityIDEdit=0x7f080000;
         public static final int LoginActivityPWEdit=0x7f080001;
-        public static final int PersonActivityAddContact=0x7f08000a;
-        public static final int PersonActivityButtonCall=0x7f080006;
-        public static final int PersonActivityButtonText=0x7f080009;
-        public static final int PersonActivitySendMail=0x7f080008;
-        public static final int PersonActivityTextName=0x7f080005;
-        public static final int PresonActivitySendSPARCSMail=0x7f080007;
-        public static final int menu_settings=0x7f08000b;
+        public static final int PersonActivityAddContact=0x7f08000b;
+        public static final int PersonActivityButtonCall=0x7f080007;
+        public static final int PersonActivityButtonText=0x7f08000a;
+        public static final int PersonActivitySendMail=0x7f080009;
+        public static final int PersonActivityTextName=0x7f080006;
+        public static final int PresonActivitySendSPARCSMail=0x7f080008;
+        public static final int indexbar=0x7f080005;
+        public static final int menu_settings=0x7f08000e;
+        public static final int menu_sortbyAlphabet=0x7f08000f;
+        public static final int menu_sortbyStudentNumber=0x7f080010;
+        public static final int section=0x7f08000c;
+        public static final int textView=0x7f08000d;
     }
     public static final class layout {
         public static final int activity_login=0x7f030000;
         public static final int activity_main=0x7f030001;
         public static final int activity_person=0x7f030002;
+        public static final int result_adapter=0x7f030003;
     }
     public static final class menu {
         public static final int activity_login=0x7f070000;
@@ -51,6 +57,8 @@ public final class R {
         public static final int hello_world=0x7f050001;
         public static final int login=0x7f05000b;
         public static final int menu_settings=0x7f050002;
+        public static final int menu_string_sortbyAlphabet=0x7f05000d;
+        public static final int menu_string_sortbyStudentNumber=0x7f05000c;
         public static final int name=0x7f050004;
         public static final int sendText=0x7f050006;
         public static final int title_activity_login=0x7f050008;

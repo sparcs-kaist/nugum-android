@@ -152,14 +152,22 @@ public class MainActivity<listNames> extends Activity {
 				inputManager.showSoftInput(edit, 0);
 			}
 		});
+		String filterText = edit.getText().toString();
+		if (filterText != null) {
+			if (filterText.trim().equals("")) {
+				Adapter.getFilter().filter(filterText.trim());
+			}
+		}
 	}
 	
 	private void drawListDataSortByAlphabet() {
+		listData = (ArrayList<Person>) origData.clone();
 		Collections.sort(listData, new alphabetComparator());
 		drawListData();
 	}
 	
 	private void drawListDataSortByStudentNumber() {
+		listData = (ArrayList<Person>) origData.clone();
 		Collections.sort(listData, new studentNumberComparator());
 		drawListData();
 	}
